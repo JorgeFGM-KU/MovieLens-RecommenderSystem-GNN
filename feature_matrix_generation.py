@@ -8,6 +8,7 @@ def get_users_features_matrix(users_file):
     ages = [] # Will be min-max scaled
     genders = [] # Will be one-hot encoded
     occupations = [] # Will be one-hot encoded
+    ids = []
 
     with open(users_file, encoding = "ISO-8859-1") as data_file:
         for line in data_file:
@@ -20,6 +21,7 @@ def get_users_features_matrix(users_file):
             ages.append(age)
             genders.append(gender)
             occupations.append(occupation)
+            ids.append(id)
 
     ages = np.array(ages)
     genders = np.array(genders)
@@ -33,7 +35,7 @@ def get_users_features_matrix(users_file):
     occupations = onehot_encoder.fit_transform(occupations.reshape(-1, 1))
     
     features_matrix = np.concatenate((ages, genders, occupations), axis=1, dtype=np.float64)
-    return torch.tensor(features_matrix, dtype=torch.float64)
+    return ids, torch.tensor(features_matrix, dtype=torch.float64)
 
     '''
     unique_zip_codes = dataframe["zip_code"].unique().tolist()
@@ -60,6 +62,7 @@ def get_users_features_matrix(users_file):
 def get_items_features_matrix(path_to_raw):
     years = []
     genre_vectors = []
+    ids = []
 
     with open(path_to_raw, encoding = "ISO-8859-1") as data_file:
         for line in data_file:
@@ -81,6 +84,7 @@ def get_items_features_matrix(path_to_raw):
                 year = int(split_date[2])
                 years.append(year)
                 genre_vectors.append(genre_vector)
+                ids.append(id)
 
     years = np.array(years)
     genre_vectors = np.array(genre_vectors)
@@ -89,4 +93,4 @@ def get_items_features_matrix(path_to_raw):
     years = std_scaler.fit_transform(years.reshape(-1,1))
 
     features_matrix = np.concatenate((years, genre_vectors), axis=1, dtype=np.float64)
-    return torch.tensor(features_matrix, dtype=torch.float64)
+    return ids, torch.tensor(features_matrix, dtype=torch.float64)
