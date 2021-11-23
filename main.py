@@ -10,7 +10,7 @@ from data_preprocessing import get_data
 from load_data import generate_dgl_graph
 from feature_matrix_generation import get_users_features_matrix, get_items_features_matrix
 
-df = get_data()
+df = get_data(raw_data_path="data/raw/")
 users = df.users()
 movies = df.movies()
 ratings = df.ratings()
@@ -18,21 +18,19 @@ lens = df.all()
 graph = generate_dgl_graph(ratings)
 graph.remove_nodes(0, 'user_id')
 graph.remove_nodes(0, 'movie_id')
-graph.remove_nodes(267, 'movie_id')
 print(graph)
 
-user_feat = get_users_features_matrix('data/raw/u.user')
-movie_feat = get_items_features_matrix('data/raw/u.item')
+user_ids, user_feat = get_users_features_matrix('data/raw/u.user')
+movie_ids, movie_feat = get_items_features_matrix('data/raw/u.item')
 
-print("\n----- user_feat -----\n", user_feat, user_feat.size())
-print("\n----- movie_feat -----\n", movie_feat, movie_feat.size())
+print("\n----- user_feat -----\n", user_feat, user_feat.shape)
+print("\n----- movie_feat -----\n", movie_feat, movie_feat.shape)
 graph.nodes['user_id'].data['feat'] = user_feat
 graph.nodes['movie_id'].data['feat'] = movie_feat
 
 class RGCN(nn.Module):
     def __init__(self, in_feats, hid_feats, out_feats, rel_names):
         super().__init__()
-
         self.conv1 = dglnn.HeteroGraphConv({
             rel: dglnn.GraphConv(in_feats, hid_feats)
             for rel in rel_names}, aggregate='sum')
@@ -46,7 +44,7 @@ class RGCN(nn.Module):
         h = self.conv1(graph, inputs)
         h = {k: F.relu(v) for k, v in h.items()}
         #h = self.conv2(graph, h)
-        h = self.conv2(graph, torch.transpose(h, 0, 1))
+        h = self.conv2(graph, h)
         return h
 
 class HeteroDotProductPredictor(nn.Module):

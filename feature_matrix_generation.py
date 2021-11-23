@@ -66,7 +66,6 @@ def get_items_features_matrix(path_to_raw):
 
     with open(path_to_raw, encoding = "ISO-8859-1") as data_file:
         for line in data_file:
-            save_this_line = True
 
             split = line.split("|")
             id = int(split[0])
@@ -79,12 +78,12 @@ def get_items_features_matrix(path_to_raw):
             genre_vector.append(int(split[23][0]))
             
             split_date = release_date.split("-")
-            if split_date == ['']: save_this_line = False
-            if save_this_line:
+            try:
                 year = int(split_date[2])
-                years.append(year)
-                genre_vectors.append(genre_vector)
-                ids.append(id)
+            except: year = 0
+            years.append(year)
+            genre_vectors.append(genre_vector)
+            ids.append(id)
 
     years = np.array(years)
     genre_vectors = np.array(genre_vectors)
