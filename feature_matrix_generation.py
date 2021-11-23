@@ -35,7 +35,7 @@ def get_users_features_matrix(users_file):
     occupations = onehot_encoder.fit_transform(occupations.reshape(-1, 1))
     
     features_matrix = np.concatenate((ages, genders, occupations), axis=1, dtype=np.float64)
-    return ids, torch.tensor(features_matrix, dtype=torch.float64)
+    return ids, torch.tensor(features_matrix, dtype=torch.float32)
 
     '''
     unique_zip_codes = dataframe["zip_code"].unique().tolist()
@@ -93,4 +93,4 @@ def get_items_features_matrix(path_to_raw):
     years = std_scaler.fit_transform(years.reshape(-1,1))
 
     features_matrix = np.concatenate((years, genre_vectors), axis=1, dtype=np.float64)
-    return ids, torch.tensor(features_matrix, dtype=torch.float64)
+    return ids, torch.tensor(features_matrix, dtype=torch.float32)
