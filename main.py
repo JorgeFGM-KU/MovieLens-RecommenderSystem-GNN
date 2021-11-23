@@ -21,8 +21,8 @@ graph.remove_nodes(0, 'movie_id')
 graph.remove_nodes(267, 'movie_id')
 print(graph)
 
-user_feat = get_users_features_matrix('ml-100k/u.user')
-movie_feat = get_items_features_matrix('ml-100k/u.item')
+user_feat = get_users_features_matrix('data/raw/u.user')
+movie_feat = get_items_features_matrix('data/raw/u.item')
 
 print("\n----- user_feat -----\n", user_feat, user_feat.size())
 print("\n----- movie_feat -----\n", movie_feat, movie_feat.size())
