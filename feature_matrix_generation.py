@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import requests
+import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder
 
 
@@ -74,7 +75,7 @@ def get_items_features_matrix(path_to_raw):
             release_date = split[2]
             url = split[4]
             
-            genre_vector = [int(split[x]) for x in range(5, 23)]
+            genre_vector = [int(split[x]) for x in range(6, 23)]
             genre_vector.append(int(split[23][0]))
             
             split_date = release_date.split("-")
@@ -85,11 +86,18 @@ def get_items_features_matrix(path_to_raw):
             genre_vectors.append(genre_vector)
             ids.append(id)
 
+    imdb_ratings = pd.read_excel("data/imdb_ratings.xlsx")["IMDB"].tolist() 
+    imdb_ratings.insert(267, -1)
+    non_null_mean = np.array([x for x in imdb_ratings if x != -1]).mean().round(2)
+    imdb_ratings = np.array([x if x != -1 else non_null_mean for x in imdb_ratings])
+
     years = np.array(years)
     genre_vectors = np.array(genre_vectors)
 
     std_scaler = StandardScaler()
     years = std_scaler.fit_transform(years.reshape(-1,1))
+    minmax_scaler = MinMaxScaler()
+    imdb_ratings = minmax_scaler.fit_transform(imdb_ratings.reshape(-1,1))
 
-    features_matrix = np.concatenate((years, genre_vectors), axis=1, dtype=np.float64)
+    features_matrix = np.concatenate((years, imdb_ratings, genre_vectors), axis=1, dtype=np.float64)
     return ids, torch.tensor(features_matrix, dtype=torch.float32)
